@@ -55,7 +55,11 @@ const Usuario = sequelize.define("usuario", {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 3
-  }
+  },
+  activo: {
+  type: DataTypes.BOOLEAN,
+  defaultValue: true
+}
 }, {
   timestamps: false,
   freezeTableName: true

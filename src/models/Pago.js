@@ -9,7 +9,8 @@ const Pagos = sequelize.define("pagos", {
   },
   fechaPago: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: false,
+    defaultValue: DataTypes.NOW
   },
   importe: {
     type: DataTypes.DECIMAL(10, 2),

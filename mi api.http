@@ -1,0 +1,327 @@
+### VARIABLES GLOBALES
+@baseUrl = http://localhost:3000/api/v1
+@json = application/json
+
+### ==========================
+### USUARIOS
+### ==========================
+
+### Lista usuarios
+GET {{baseUrl}}/usuarios
+
+### Lista usuarios limite
+GET {{baseUrl}}/usuarios?page=1&limit=5
+
+### Obtener usuario por id
+GET {{baseUrl}}/usuarios/20
+
+### Obtener usuarios con password vencida (mas de 90 dias)
+GET {{baseUrl}}/usuarios/password-vencidas
+
+### Crear usuario
+POST {{baseUrl}}/usuarios
+Content-Type: {{json}}
+
+{
+  "email": "test.suscripciones@example.com",
+  "password": "123456",
+  "usuario": "test_suscripciones",
+  "nyap": "Usuario Test Suscripciones"
+}
+
+### Test crear usuario (ERROR: FALTA EMAIL)
+POST {{baseUrl}}/usuarios
+Content-Type: {{json}}
+
+{
+  "password": "Secr3t0!",
+  "fecha_nac": "1995-05-20"
+  
+}
+
+### Test crear usuario (ERROR: EMAIL REPETIDO)
+POST {{baseUrl}}/usuarios
+Content-Type: {{json}}
+
+{
+  "email": "test.softdelete@actualizado",
+  "password": "Secr3t0!"
+  
+}
+
+### Actualizar a un usuario
+PUT {{baseUrl}}/usuarios/20
+Content-Type: {{json}}
+
+{
+  "password": "new hasshed password"
+}
+
+### Soft delete de usuario (Cambia estado activo de 1 a 0)
+DELETE  {{baseUrl}}/usuarios/30
+Content-Type: {{json}}
+
+{
+  "activo": false
+}
+
+### ==========================
+### ARTISTAS
+### ==========================
+
+### Lista Artista
+GET {{baseUrl}}/artistas
+
+### Obtener artista por id
+GET {{baseUrl}}/artistas/51
+
+### Crear artista
+POST {{baseUrl}}/artistas
+Content-Type: {{json}}
+
+{
+  "artista": "Test Artista"
+}
+
+### ==========================
+### ALBUMES
+### ==========================
+
+### Lista albumes completa
+GET {{baseUrl}}/albumes
+
+### Lista albumes por artista
+GET {{baseUrl}}/albumes?artistaId=51
+
+### Lista de canciones en un album
+GET {{baseUrl}}/albumes/54/canciones
+
+### Crear album
+POST {{baseUrl}}/albumes
+Content-Type: {{json}}
+
+{
+  "album": "Test Album",
+  "id_artista": 51,
+  "id_discografica": 57,
+  "anio_publicacion": 2000
+}
+
+### ==========================
+### CANCIONES
+### ==========================
+
+### Lista canciones
+GET {{baseUrl}}/canciones
+
+### Lista canciones por genero
+GET {{baseUrl}}/canciones?genero=1
+
+### Lista canciones por artista
+GET {{baseUrl}}/canciones?artistaId=1
+
+### Lista canciones por album
+GET {{baseUrl}}/canciones?albumId=54
+
+### Buscar cancion por id
+GET {{baseUrl}}/canciones/142
+
+### Asociar genero a cancion
+POST {{baseUrl}}/canciones/142/generos/
+Content-Type: {{json}}
+
+{
+  "id_genero": 1
+}
+
+### Quitar genero a cancion
+DELETE {{baseUrl}}/canciones/142/generos/1
+
+### ==========================
+### GENEROS
+### ==========================
+
+### Lista de generos
+GET {{baseUrl}}/generos
+
+### Añadir genero
+POST {{baseUrl}}/generos
+Content-Type: {{json}}
+
+{
+  "genero": "Pop"
+}
+
+### ==========================
+### PLAYLISTS
+### ==========================
+
+### Lista de playlists
+GET {{baseUrl}}/playlists
+
+### Lista de palylist por id
+GET {{baseUrl}}/playlists/12
+
+### Crear playlist
+POST {{baseUrl}}/playlists
+Content-Type: {{json}} 
+
+{
+  "playlist": "Test Playlist Soft Delete",
+  "id_usuario": 22
+}
+
+### Soft Delete / Recuperar playlist
+PUT {{baseUrl}}/playlists/12
+Content-Type: {{json}}
+
+{
+  "estado": "eliminada"
+}
+
+### Actualizar playlist
+Put {{baseUrl}}/playlists/12
+Content-Type: {{json}}
+
+{
+ "playlist": "Test soft delete" 
+}
+
+### Agregar cancion a una playlist
+POST {{baseUrl}}/playlists/11/canciones
+Content-Type: {{json}}
+
+{
+  "id_cancion": 142,
+  "orden": 1
+}
+
+### ERROR agregar cancion a una playlist eliminada
+POST {{baseUrl}}/playlists/12/canciones
+Content-Type: {{json}}
+
+{
+  "id_cancion": 142,
+  "orden": 1
+}
+
+### Quitar canción de playlist
+DELETE {{baseUrl}}/playlists/12/canciones/142
+
+### ==========================
+### SUSCRIPCIONES
+### ==========================
+
+### Lista de suscripciones
+GET {{baseUrl}}/suscripciones
+
+### Suscripciones por id
+GET {{baseUrl}}/suscripciones/94
+
+### Crear suscripciones error fecha
+POST {{baseUrl}}/suscripciones
+Content-Type: {{json}}
+
+{
+  "id_usuario": 23,
+  "id_tipo_usuario": 3,
+  "fecha_inicio": "2025-10-01T00:00:00Z",
+  "fecha_renovacion": "2024-11-01T00:00:00Z"
+}
+
+### Crear suscripcion / Comprobacion fecha de inicio repetida
+POST {{baseUrl}}/suscripciones
+Content-Type: {{json}}
+
+{
+  "id_usuario": 23,
+  "id_tipo_usuario": 1,
+  "fecha_inicio": "2025-10-01T00:00:00Z",
+  "fecha_renovacion": "2025-11-01T00:00:00Z"
+}
+
+### Actualizar suscripcion
+POST {{baseUrl}}/suscripciones
+Content-Type: {{json}}
+
+{
+  "id_usuario": 23,
+  "id_tipo_usuario": 1,
+  "fecha_inicio": "2025-11-01T00:00:00Z",
+  "fecha_renovacion": "2025-11-23T00:00:00Z"
+}
+
+### ==========================
+### MÉTODOS DE PAGO
+### ==========================
+
+### ERROR lista de pagos requiere id del usuario
+GET {{baseUrl}}/metodos-pago
+
+### Lista de metodos de pago por usuario
+GET {{baseUrl}}/metodos-pago?usuarioId=1
+
+### Crear método de pago (sin CVC; tarjeta enmascarada por el servidor)
+### Id forma de pago( 1 = Efectivo, 2 = Tarjeta de Debito, 3 = Tarjeta de credito, 4 = Debito Automatico x Banco.)
+POST {{baseUrl}}/metodos-pago
+Content-Type: {{json}}
+
+{
+  "id_usuario": 23,
+  "tipo_forma_pago": "Tarjeta de crédito",
+  "nro_tarjeta": "4519000000001234",
+  "mes_caduca": 12,
+  "anio_caduca": 2027,
+  "banco_codigo": "BANK01"
+}
+
+### ==========================
+### PAGOS
+### ==========================
+
+# Registrar pago (referenciando suscripción y método de pago válidos)
+POST {{baseUrl}}/pagos
+Content-Type: {{json}}
+
+{
+  "id_usuario": 23,
+  "id_suscripcion": 97,
+  "id_datos_pago": 44,
+  "importe": 500,
+  "fechaPago": "2025-11-22T00:00:00Z"
+}
+
+### Listar pagos por usuario y rango
+GET {{baseUrl}}/pagos?usuarioId=23&desde=2020-01-01&hasta=2025-11-21
+
+### Buscar pago por id del pago
+GET {{baseUrl}}/pagos/95
+
+### ==========================
+### VISTAS AVANZADAS CON JOINS (EJERCICIOS ADICIONALES)
+### ==========================
+
+### EJERCICIO 1: Canciones populares por país
+# Obtener las canciones más reproducidas agrupadas por país de usuarios
+# Incluye: nombre_cancion, nombre_artista, nombre_album, nombre_pais, total_reproducciones, apariciones_en_playlists
+GET {{baseUrl}}/vistas/canciones-populares-por-pais
+
+### EJERCICIO 1: Con filtros opcionales (por país específico)
+GET {{baseUrl}}/vistas/canciones-populares-por-pais?pais=Argentina
+
+### EJERCICIO 1: Con límite de resultados
+GET {{baseUrl}}/vistas/canciones-populares-por-pais?limit=10
+
+### EJERCICIO 2: Ingresos por artista y discográfica
+# Analizar ingresos generados por cada combinación artista-discográfica
+# Incluye: nombre_artista, nombre_discografica, nombre_pais_discografica, total_ingresos, cantidad_suscripciones_activas, total_canciones, promedio_reproducciones
+GET {{baseUrl}}/vistas/ingresos-por-artista-discografica
+
+### EJERCICIO 2: Con filtro por país de discográfica
+GET {{baseUrl}}/vistas/ingresos-por-artista-discografica?pais=Argentina
+
+### EJERCICIO 2: Con filtro por monto mínimo de ingresos
+GET {{baseUrl}}/vistas/ingresos-por-artista-discografica?minimo_ingresos=50
+
+### EJERCICIO 2: Con ordenamiento por cantidad de suscripciones
+GET {{baseUrl}}/vistas/ingresos-por-artista-discografica?orden=suscripciones

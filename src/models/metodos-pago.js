@@ -12,7 +12,7 @@ const DatosPagoUsuario = sequelize.define("datos_pago_usuario", {
     allowNull: true
   },
   banco_codigo: {
-    type: DataTypes.SMALLINT,
+    type: DataTypes.STRING(15),
     allowNull: true
   },
   nro_tarjeta_masc: {
