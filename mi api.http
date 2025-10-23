@@ -13,7 +13,7 @@ GET {{baseUrl}}/usuarios
 GET {{baseUrl}}/usuarios?page=1&limit=5
 
 ### Obtener usuario por id
-GET {{baseUrl}}/usuarios/20
+GET {{baseUrl}}/usuarios/24
 
 ### Obtener usuarios con password vencida (mas de 90 dias)
 GET {{baseUrl}}/usuarios/password-vencidas
@@ -23,10 +23,15 @@ POST {{baseUrl}}/usuarios
 Content-Type: {{json}}
 
 {
-  "email": "test.suscripciones@example.com",
-  "password": "123456",
-  "usuario": "test_suscripciones",
-  "nyap": "Usuario Test Suscripciones"
+  "email": "test.ultimotest2@example.com",
+  "password": "123ultimotest2",
+  "usuario": "UltimoUser2",
+  "nyap": "Usuario Test Final2",
+  "fecha_nac": "1999-12-30",
+  "sexo":"M",
+  "cp":"5000",
+  "id_pais":"10",
+  "id_tipo_usuario": "2"
 }
 
 ### Test crear usuario (ERROR: FALTA EMAIL)
@@ -35,7 +40,7 @@ Content-Type: {{json}}
 
 {
   "password": "Secr3t0!",
-  "fecha_nac": "1995-05-20"
+  "fecha_nac": "1999-11-14"
   
 }
 
@@ -50,19 +55,28 @@ Content-Type: {{json}}
 }
 
 ### Actualizar a un usuario
-PUT {{baseUrl}}/usuarios/20
+PUT {{baseUrl}}/usuarios/26
 Content-Type: {{json}}
 
 {
-  "password": "new hasshed password"
+  "password": "new hasshed password",
+  "id_tipo_usuario": 3,
+  "fecha_nac": "2000-12-23",
+  "sexo": "O"
 }
 
 ### Soft delete de usuario (Cambia estado activo de 1 a 0)
-DELETE  {{baseUrl}}/usuarios/30
+DELETE {{baseUrl}}/usuarios/26
+
+### Hard delete (eliminación permanente) /No recomendado ya que deja huecos en la bb.dd ;(
+DELETE {{baseUrl}}/usuarios/25?force=true
+
+### Reactivar usuario
+PUT {{baseUrl}}/usuarios/26
 Content-Type: {{json}}
 
 {
-  "activo": false
+  "activo": true
 }
 
 ### ==========================
@@ -80,7 +94,83 @@ POST {{baseUrl}}/artistas
 Content-Type: {{json}}
 
 {
-  "artista": "Test Artista"
+  "artista": "Bullet For My Valentine"
+}
+
+### ==========================
+### PAISES
+### ==========================
+
+### Listar todos los países
+GET {{baseUrl}}/paises?page=1&limit=20
+
+### Listar solo 5 países
+GET {{baseUrl}}/paises?limit=5
+
+### Obtener país por ID
+GET {{baseUrl}}/paises/1
+
+### Crear nuevo país (ÉXITO)
+POST {{baseUrl}}/paises
+Content-Type: application/json
+
+{
+  "pais": "Reino Unido"
+}
+
+### Crear país (ERROR - duplicado)
+POST {{baseUrl}}/paises
+Content-Type: application/json
+
+{
+  "pais": "Argentina"
+}
+
+### Crear país (ERROR - falta datos)
+POST {{baseUrl}}/paises
+Content-Type: application/json
+
+{
+  "pais": ""
+}
+
+### ==========================
+### DISCOGRAFICAS
+### ==========================
+
+### Listar todas las discográficas
+GET {{baseUrl}}/discograficas?page=1&limit=20
+
+### Obtener discográfica por ID
+GET {{baseUrl}}/discograficas/58
+
+### Filtrar discográficas por país
+GET {{baseUrl}}/discograficas/pais/10
+
+### Crear nueva discográfica 
+POST {{baseUrl}}/discograficas
+Content-Type: application/json
+
+{
+  "discografica": "Visible Noise",
+  "id_pais": 15
+}
+
+### Crear discográfica (ERROR - duplicada)
+POST {{baseUrl}}/discograficas
+Content-Type: application/json
+
+{
+  "discografica": "Visible Noise", 
+  "id_pais": 15
+}
+
+### Crear discográfica (ERROR - falta datos)
+POST {{baseUrl}}/discograficas
+Content-Type: application/json
+
+{
+  "discografica": "Visible Noise"
 }
 
 ### ==========================
@@ -101,10 +191,10 @@ POST {{baseUrl}}/albumes
 Content-Type: {{json}}
 
 {
-  "album": "Test Album",
-  "id_artista": 51,
-  "id_discografica": 57,
-  "anio_publicacion": 2000
+  "album": "The Poison",
+  "id_artista": 53,
+  "id_discografica": 58,
+  "anio_publicacion": 2005
 }
 
 ### ==========================
@@ -124,14 +214,56 @@ GET {{baseUrl}}/canciones?artistaId=1
 GET {{baseUrl}}/canciones?albumId=54
 
 ### Buscar cancion por id
-GET {{baseUrl}}/canciones/142
+GET {{baseUrl}}/canciones/144
+
+### Crear canción
+POST {{baseUrl}}/canciones
+Content-Type: application/json
+
+{
+  "cancion": "Tears Don't Fall" ,
+  "duracion_seg": 348,
+  "id_album": 56,
+  "reproducciones": 12395532,
+  "likes": 67000
+}
+
+### Crear canción (ERROR - falta nombre)
+POST {{baseUrl}}/canciones
+Content-Type: application/json
+
+{
+  "duracion_seg": 200,
+  "id_album": 1
+}
+
+### Crear canción ERROR - duración invalida
+POST {{baseUrl}}/canciones
+Content-Type: application/json
+
+{
+  "cancion": "Test cancion",
+  "duracion_seg": 0,
+  "id_album": 1
+}
+
+### Crear canción ERROR - album no existe
+POST {{baseUrl}}/canciones
+Content-Type: application/json
+
+{
+  "cancion": "Test cancion",
+  "duracion_seg": 180,
+  "id_album": 9999
+}
+
 
 ### Asociar genero a cancion
-POST {{baseUrl}}/canciones/142/generos/
+POST {{baseUrl}}/canciones/144/generos/
 Content-Type: {{json}}
 
 {
-  "id_genero": 1
+  "id_genero": 14
 }
 
 ### Quitar genero a cancion
@@ -149,7 +281,7 @@ POST {{baseUrl}}/generos
 Content-Type: {{json}}
 
 {
-  "genero": "Pop"
+  "genero": "Metalcore"
 }
 
 ### ==========================
@@ -160,15 +292,15 @@ Content-Type: {{json}}
 GET {{baseUrl}}/playlists
 
 ### Lista de palylist por id
-GET {{baseUrl}}/playlists/12
+GET {{baseUrl}}/playlists/13
 
 ### Crear playlist
 POST {{baseUrl}}/playlists
 Content-Type: {{json}} 
 
 {
-  "playlist": "Test Playlist Soft Delete",
-  "id_usuario": 22
+  "playlist": "Bullet",
+  "id_usuario": 24
 }
 
 ### Soft Delete / Recuperar playlist
@@ -188,11 +320,11 @@ Content-Type: {{json}}
 }
 
 ### Agregar cancion a una playlist
-POST {{baseUrl}}/playlists/11/canciones
+POST {{baseUrl}}/playlists/13/canciones
 Content-Type: {{json}}
 
 {
-  "id_cancion": 142,
+  "id_cancion": 144,
   "orden": 1
 }
 
@@ -216,15 +348,15 @@ DELETE {{baseUrl}}/playlists/12/canciones/142
 GET {{baseUrl}}/suscripciones
 
 ### Suscripciones por id
-GET {{baseUrl}}/suscripciones/94
+GET {{baseUrl}}/suscripciones/98
 
 ### Crear suscripciones error fecha
 POST {{baseUrl}}/suscripciones
 Content-Type: {{json}}
 
 {
-  "id_usuario": 23,
-  "id_tipo_usuario": 3,
+  "id_usuario": 24,
+  "id_tipo_usuario": 1,
   "fecha_inicio": "2025-10-01T00:00:00Z",
   "fecha_renovacion": "2024-11-01T00:00:00Z"
 }
@@ -234,32 +366,69 @@ POST {{baseUrl}}/suscripciones
 Content-Type: {{json}}
 
 {
-  "id_usuario": 23,
+  "id_usuario": 24,
   "id_tipo_usuario": 1,
-  "fecha_inicio": "2025-10-01T00:00:00Z",
-  "fecha_renovacion": "2025-11-01T00:00:00Z"
+  "fecha_inicio": "2024-11-14T00:00:00Z",
+  "fecha_renovacion": "2025-11-14T00:00:00Z"
 }
 
-### Actualizar suscripcion
-POST {{baseUrl}}/suscripciones
-Content-Type: {{json}}
+### Actualizar suscripcion cambiar fecha renovacion
+PUT {{baseUrl}}/suscripciones/98
+Content-Type: application/json
 
 {
-  "id_usuario": 23,
-  "id_tipo_usuario": 1,
-  "fecha_inicio": "2025-11-01T00:00:00Z",
-  "fecha_renovacion": "2025-11-23T00:00:00Z"
+  "fecha_renovacion": "2025-12-31"
+}
+
+### Actualizar suscripcion cambiar tipo de usuario
+PUT {{baseUrl}}/suscripciones/98
+Content-Type: application/json
+
+{
+  "id_tipo_usuario": 2
+}
+
+### Actualizar suscripcion ERROR fecha inválida
+PUT {{baseUrl}}/suscripciones/98
+Content-Type: application/json
+
+{
+  "fecha_renovacion": "fecha-invalida"
+}
+
+### Actualizar suscripcion ERROR fecha anterior a inicio
+PUT {{baseUrl}}/suscripciones/98
+Content-Type: application/json
+
+{
+  "fecha_renovacion": "2019-01-01"
+}
+
+### Actualizar suscripcion ERROR tipo usuario no existe
+PUT {{baseUrl}}/suscripciones/1
+Content-Type: application/json
+
+{
+  "id_tipo_usuario": 999
+}
+
+### Actualizar suscripcion ERROR suscripcion no existe
+PUT {{baseUrl}}/suscripciones/999
+Content-Type: application/json
+
+{
+  "fecha_renovacion": "2025-12-31"
 }
 
 ### ==========================
-### MÉTODOS DE PAGO
+### METODOS DE PAGO
 ### ==========================
 
 ### ERROR lista de pagos requiere id del usuario
 GET {{baseUrl}}/metodos-pago
 
 ### Lista de metodos de pago por usuario
-GET {{baseUrl}}/metodos-pago?usuarioId=1
+GET {{baseUrl}}/metodos-pago?usuarioId=24
 
 ### Crear método de pago (sin CVC; tarjeta enmascarada por el servidor)
 ### Id forma de pago( 1 = Efectivo, 2 = Tarjeta de Debito, 3 = Tarjeta de credito, 4 = Debito Automatico x Banco.)
@@ -267,12 +436,12 @@ POST {{baseUrl}}/metodos-pago
 Content-Type: {{json}}
 
 {
-  "id_usuario": 23,
+  "id_usuario": 24,
   "tipo_forma_pago": "Tarjeta de crédito",
-  "nro_tarjeta": "4519000000001234",
+  "nro_tarjeta": "4519856744441234",
   "mes_caduca": 12,
-  "anio_caduca": 2027,
-  "banco_codigo": "BANK01"
+  "anio_caduca": 2030,
+  "banco_codigo": "BANKO"
 }
 
 ### ==========================
@@ -284,18 +453,18 @@ POST {{baseUrl}}/pagos
 Content-Type: {{json}}
 
 {
-  "id_usuario": 23,
-  "id_suscripcion": 97,
-  "id_datos_pago": 44,
-  "importe": 500,
+  "id_usuario": 24,
+  "id_suscripcion": 98,
+  "id_datos_pago": 45,
+  "importe": 1000,
   "fechaPago": "2025-11-22T00:00:00Z"
 }
 
 ### Listar pagos por usuario y rango
-GET {{baseUrl}}/pagos?usuarioId=23&desde=2020-01-01&hasta=2025-11-21
+GET {{baseUrl}}/pagos?usuarioId=1&desde=2020-01-01&hasta=2021-02-01
 
 ### Buscar pago por id del pago
-GET {{baseUrl}}/pagos/95
+GET {{baseUrl}}/pagos/1
 
 ### ==========================
 ### VISTAS AVANZADAS CON JOINS (EJERCICIOS ADICIONALES)
@@ -310,9 +479,9 @@ GET {{baseUrl}}/vistas/canciones-populares-por-pais
 GET {{baseUrl}}/vistas/canciones-populares-por-pais?pais=Argentina
 
 ### EJERCICIO 1: Con límite de resultados
-GET {{baseUrl}}/vistas/canciones-populares-por-pais?limit=10
+GET {{baseUrl}}/vistas/canciones-populares-por-pais?limit=3
 
-### EJERCICIO 2: Ingresos por artista y discográfica
+### EJERCICIO 2: Ingresos por artista y discográfica (NO FUNCIONA)
 # Analizar ingresos generados por cada combinación artista-discográfica
 # Incluye: nombre_artista, nombre_discografica, nombre_pais_discografica, total_ingresos, cantidad_suscripciones_activas, total_canciones, promedio_reproducciones
 GET {{baseUrl}}/vistas/ingresos-por-artista-discografica

@@ -5,7 +5,6 @@ class VistasController {
     try {
       const { pais, limit } = req.query;
 
-      // Base de la consulta
       let query = `
         SELECT
           c.cancion AS nombre_cancion,
@@ -24,21 +23,16 @@ class VistasController {
         WHERE pl.estado = "activa"
       `;
 
-      // Filtro opcional por país
       if (pais) {
         query += ` AND p.pais = :pais `;
       }
-
-      // Agrupamiento y ordenamiento
       query += ` GROUP BY p.id_pais, c.id_cancion `;
       query += ` ORDER BY p.pais, total_reproducciones DESC `;
 
-      // Ejecutar consulta
       const [resultados] = await sequelize.query(query, {
-        replacements: { pais }, // evita inyección SQL
+        replacements: { pais }, 
       });
 
-      // Aplicar límite si se pasó
       const dataFinal = limit ? resultados.slice(0, parseInt(limit)) : resultados;
 
       res.json({

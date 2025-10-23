@@ -32,8 +32,6 @@ const usuariosController = {
         paginacion: {
           mostrando: usuarios.length,
           total: count,
-          pagina: page,
-          totalPaginas: Math.ceil(count / limit),
           mensaje: `Mostrando ${usuarios.length} usuarios de ${count}.`
         }
       });
@@ -107,11 +105,8 @@ const usuariosController = {
         cp, 
         id_pais = 1, 
         id_tipo_usuario = 3,
-        
         fecha_mod_password 
       } = req.body;
-
-      // Validaciones básicas
       if (!email || !password) {
         return res.status(400).json({
           success: false,
@@ -121,7 +116,6 @@ const usuariosController = {
           }
         });
       }
-
       if (password.length < 6) {
         return res.status(400).json({
           success: false,
@@ -131,19 +125,17 @@ const usuariosController = {
           }
         });
       }
-
       const usuarioExistente = await Usuario.findOne({ where: { email } });
       if (usuarioExistente) {
         return res.status(409).json({
           success: false,
           error: {
-            code: "EMAIL_DUPLICADO",
+            code: "DUPLICATE_EMAIL",
             message: "El email ya está registrado"
           }
         });
       }
 
-      // Hash de la contraseña
       const saltRounds = 10;
       const passwordHash = await bcrypt.hash(password, saltRounds);
 
@@ -157,9 +149,9 @@ const usuariosController = {
         cp,
         id_pais,
         id_tipo_usuario,
+        activo: true
       };
 
-      // Solo usar fecha_mod_password si se proporciona
       if (fecha_mod_password) {
         usuarioData.fecha_mod_password = fecha_mod_password;
       } else {
@@ -168,7 +160,6 @@ const usuariosController = {
 
       const nuevoUsuario = await Usuario.create(usuarioData);
 
-      // No enviar password en la respuesta
       const usuarioResponse = { ...nuevoUsuario.toJSON() };
       delete usuarioResponse.password;
 
@@ -215,8 +206,8 @@ const usuariosController = {
         cp, 
         id_pais, 
         id_tipo_usuario,
-        
-        fecha_mod_password 
+        fecha_mod_password,
+        activo
       } = req.body;
 
       const usuarioExistente = await Usuario.findByPk(id);
@@ -226,6 +217,26 @@ const usuariosController = {
           error: {
             code: "NOT_FOUND",
             message: "Usuario no encontrado"
+          }
+        });
+      }
+
+      if (activo === true && usuarioExistente.activo === true) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: "USUARIO_YA_ACTIVO",
+            message: "El usuario ya está activo"
+          }
+        });
+      }
+
+      if (activo === false && usuarioExistente.activo === false) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: "USUARIO_YA_INACTIVO", 
+            message: "El usuario ya está inactivo"
           }
         });
       }
@@ -251,10 +262,10 @@ const usuariosController = {
         sexo: sexo || usuarioExistente.sexo,
         cp: cp !== undefined ? cp : usuarioExistente.cp,
         id_pais: id_pais || usuarioExistente.id_pais,
-        id_tipo_usuario: id_tipo_usuario || usuarioExistente.id_tipo_usuario
+        id_tipo_usuario: id_tipo_usuario || usuarioExistente.id_tipo_usuario,
+        activo: activo !== undefined ? activo : usuarioExistente.activo
       };
 
-      // Si se proporciona fecha_mod_password, usarla (para testing)
       if (fecha_mod_password !== undefined) {
         updateData.fecha_mod_password = fecha_mod_password;
       }
@@ -287,10 +298,17 @@ const usuariosController = {
         attributes: { exclude: ["password"] }
       });
 
+      let mensaje = "Usuario actualizado exitosamente";
+      if (activo === true) {
+        mensaje = "Usuario reactivado exitosamente";
+      } else if (activo === false) {
+        mensaje = "Usuario desactivado exitosamente";
+      }
+
       res.json({
         success: true,
         data: usuarioActualizado,
-        message: "Usuario actualizado exitosamente"
+        message: mensaje
       });
     } catch (error) {
       console.error("Error en update usuario:", error);
@@ -320,6 +338,7 @@ const usuariosController = {
   delete: async (req, res) => {
     try {
       const { id } = req.params;
+      const { force } = req.query;
 
       const usuario = await Usuario.findByPk(id);
       if (!usuario) {
@@ -332,12 +351,29 @@ const usuariosController = {
         });
       }
 
-      await usuario.update({ activo: false});
+      if (force !== "true" && usuario.activo === false) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: "USUARIO_YA_INACTIVO",
+            message: "El usuario ya está inactivo (ya fue eliminado)"
+          }
+        });
+      }
 
-      res.status(200).json({
-        success: true,
-        message: "Usuario eliminado exitosamente"
-      });
+      if (force === "true") {
+        await usuario.destroy();
+        return res.json({
+          success: true,
+          message: "Usuario eliminado permanentemente de la base de datos"
+        });
+      } else {
+        await usuario.update({ activo: false });
+        return res.json({
+          success: true,
+          message: "Usuario desactivado exitosamente (soft delete)"
+        });
+      }
     } catch (error) {
       console.error("Error en delete usuario:", error);
       res.status(500).json({
@@ -354,13 +390,14 @@ const usuariosController = {
   getPasswordVencidas: async (req, res) => {
     try {
       const fechaLimite = new Date();
-      fechaLimite.setDate(fechaLimite.getDate() - 90); // 90 días atrás
+      fechaLimite.setDate(fechaLimite.getDate() - 90);
 
       const usuarios = await Usuario.findAll({
         where: {
           fecha_mod_password: {
             [Op.lt]: fechaLimite
-          }
+          },
+          activo: true //
         },
         attributes: ["id_usuario", "email", "usuario", "fecha_mod_password"],
         order: [["fecha_mod_password", "ASC"]]

@@ -4,7 +4,7 @@ const artistasController = {
   getAll: async (req, res) => {
     try {
       const artistas = await Artista.findAll({
-        order: [["artista", "ASC"]]
+        order: [["id_artista", "ASC"]]
       });
       
       res.json({

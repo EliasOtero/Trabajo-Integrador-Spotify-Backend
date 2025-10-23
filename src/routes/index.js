@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const usuariosRoutes = require("./usuarios");
 const artistasRoutes = require("./artistas");
+const paisesRoutes = require('./paises');
+const discograficasRoutes = require("./discograficas")
 const albumesRoutes = require("./albumes");
 const cancionesRoutes = require("./canciones");
 const generosRoutes = require("./generos");
@@ -21,6 +23,8 @@ router.get("/", (req, res) => {
     endpoints: {
       usuarios: "/api/v1/usuarios",
       artistas: "/api/v1/artistas",
+      paises: "/api/v1/paises",
+      discograficas: "/api/v1/discograficas",
       albumes: "/api/v1/albumes",
       canciones: "/api/v1/canciones",
       generos: "/api/v1/generos",
@@ -36,6 +40,8 @@ router.get("/", (req, res) => {
 
 router.use("/usuarios", usuariosRoutes);
 router.use("/artistas", artistasRoutes);
+router.use("/paises", paisesRoutes);
+router.use("/discograficas", discograficasRoutes);
 router.use("/albumes", albumesRoutes);
 router.use("/canciones", cancionesRoutes);
 router.use("/generos", generosRoutes);

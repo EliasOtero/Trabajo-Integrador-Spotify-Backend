@@ -29,7 +29,7 @@ const albumesController = {
             attributes: ["id_discografica", "discografica"]
           }
         ],
-        order: [["album", "ASC"]]
+        order: [["id_album", "ASC"]]
       });
       
       res.json({
@@ -141,7 +141,6 @@ const albumesController = {
     }
   },
 
-  
   create: async (req, res) => {
     try {
       const { album, imagenportada, anio_publicacion, id_artista, id_discografica } = req.body;

@@ -272,41 +272,6 @@ const metodosPagoController = {
         }
       });
     }
-  },
-
-  delete: async (req, res) => {
-    try {
-      const { id } = req.params;
-      
-      const metodoPago = await DatosPagoUsuario.findByPk(id);
-      
-      if (!metodoPago) {
-        return res.status(404).json({
-          success: false,
-          error: {
-            code: "METODO_PAGO_NOT_FOUND",
-            message: "Método de pago no encontrado"
-          }
-        });
-      }
-      
-      await metodoPago.destroy();
-      
-      res.json({
-        success: true,
-        message: "Método de pago eliminado exitosamente"
-      });
-      
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: {
-          code: "DATABASE_ERROR",
-          message: "Error al eliminar método de pago",
-          details: error.message
-        }
-      });
-    }
   }
 };
 

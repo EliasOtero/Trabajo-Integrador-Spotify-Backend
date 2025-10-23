@@ -55,7 +55,7 @@ const cancionesController = {
       const canciones = await Cancion.findAll({
         where: whereConditions,
         include: includeConditions,
-        order: [["cancion", "ASC"]]
+        order: [["id_cancion", "ASC"]]
       });
       
       res.json({
